@@ -2,8 +2,21 @@
 {% block body %}
 {% if can_write %}
 <form method="post" action="{{ url_for('create') }}" data-swap="1">
-  <h2>新开一轮审评</h2>
-  <input name="lot" placeholder="批次" required />
+  <h2>新开一轮交评</h2>
+  <p>
+    <label>配方版本
+      <select name="recipe_version_id" required>
+        <option value="" disabled selected>请选择已生效版本</option>
+        {% for v in versions %}
+          <option value="{{ v.id }}">版本 {{ v.version_no }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    {% if not versions %}
+      <span class="err">尚无已生效版本，请先到「配方版本」建草案并生效。</span>
+    {% endif %}
+  </p>
+  <input name="lot" placeholder="批次（如：春芽）" required />
   <input name="aroma" type="number" step="0.1" min="0" max="10" placeholder="香气" required />
   <input name="taste" type="number" step="0.1" min="0" max="10" placeholder="滋味" required />
   <input name="liquor" type="number" step="0.1" min="0" max="10" placeholder="汤色" required />
@@ -11,7 +24,7 @@
 </form>
 {% endif %}
 <table>
-  <thead><tr><th>批次</th><th>加权分</th><th>结论</th><th>说明</th></tr></thead>
+  <thead><tr><th>批次</th><th>配方版本</th><th>加权分</th><th>结论</th><th>说明</th></tr></thead>
   <tbody id="rows">
     {% for row in rows %}{% include "_row.html" %}{% endfor %}
   </tbody>

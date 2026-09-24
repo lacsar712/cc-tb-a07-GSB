@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>拼配配方版本</h1>
+
+{% if can_write %}
+  {% if not draft %}
+  <form method="post" action="{{ url_for('create_draft') }}">
+    <h2>新建草案</h2>
+    <input name="name" placeholder="配方名称（可留空）" />
+    <button>建草案</button>
+    <p class="muted">草案可反复改母叶清单；点「生效」后生成只读版本号，之后不能再改，只能新建草案。</p>
+  </form>
+  {% else %}
+  <form method="post" action="{{ url_for('save_or_activate_draft', draft_id=draft.id) }}" id="draft-{{ draft.id }}">
+    <h2>草案 <span class="badge draft">未生效</span></h2>
+    <input name="name" value="{{ draft.name }}" placeholder="配方名称" />
+    <p class="muted">勾选本草案的母叶清单：</p>
+    <div>
+      {% for leaf in leaves %}
+        <label class="chk"><input type="checkbox" name="leaf_ids" value="{{ leaf.id }}" {% if leaf.selected %}checked{% endif %} /> {{ leaf.name }}</label>
+      {% endfor %}
+    </div>
+    <p>
+      <button name="op" value="save">保存草案</button>
+      <button name="op" value="activate">生效</button>
+    </p>
+  </form>
+  {% endif %}
+{% else %}
+  <p class="muted">观察员仅可查看版本列表与生效正文，不能建草案、不能点生效。</p>
+{% endif %}
+
+<div class="card">
+  <h2>已生效版本</h2>
+  {% if versions %}
+  <table>
+    <thead><tr><th>版本号</th><th>配方</th><th>母叶数</th><th>生效人</th><th>生效时间</th><th>正文</th></tr></thead>
+    <tbody>
+      {% for v in versions %}
+      <tr>
+        <td>版本 {{ v.version_no }}</td>
+        <td>{{ v.name }}</td>
+        <td>{{ v.leaf_count }}</td>
+        <td>{{ v.activated_by }}</td>
+        <td class="muted">{{ v.activated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td><a href="{{ url_for('version_detail', version_id=v.id) }}">查看只读正文</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">还没有已生效版本。</p>
+  {% endif %}
+</div>
+{% endblock %}

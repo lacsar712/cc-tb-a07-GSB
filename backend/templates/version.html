@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="card readonly">
+  <h1>版本 {{ version.version_no }} <span class="badge">只读 · 已生效</span></h1>
+  <p>配方：{{ version.name }}</p>
+  <p class="muted">生效人：{{ version.activated_by }} ｜ 生效时间：{{ version.activated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+
+  <h2>生效母叶清单（快照）</h2>
+  <table>
+    <thead><tr><th>#</th><th>母叶</th></tr></thead>
+    <tbody>
+      {% for l in version_leaves %}
+      <tr><td>{{ l.position + 1 }}</td><td>{{ l.leaf_name }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="muted">此正文为生效瞬间的只读快照，后续修改草案或母叶目录都不会改变它。</p>
+  <p><a href="{{ url_for('recipes_page') }}">返回版本列表</a></p>
+</div>
+{% endblock %}
