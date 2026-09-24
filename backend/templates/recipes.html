@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block body %}
+{% if can_write %}
+<section>
+  <h2>配方草案</h2>
+  <form method="post" action="{{ url_for('create_draft') }}">
+    <button>新建草案</button>
+  </form>
+  {% for d in drafts %}
+  <div class="draft">
+    <h3>草案 #{{ d.id }}（{{ d.created_by }} 建）</h3>
+    {% if d.leaves %}
+    <ul>
+      {% for leaf in d.leaves %}
+      <li>
+        {{ leaf.name }}
+        <form class="inline" method="post" action="{{ url_for('delete_leaf', recipe_id=d.id, leaf_id=leaf.id) }}">
+          <button>移除</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>还没挂母叶。</p>
+    {% endif %}
+    <form class="inline" method="post" action="{{ url_for('add_leaf', recipe_id=d.id) }}">
+      <input name="name" placeholder="母叶名称，如 春芽" required />
+      <button>挂母叶</button>
+    </form>
+    <form class="inline" method="post" action="{{ url_for('activate_recipe', recipe_id=d.id) }}">
+      <button>生效</button>
+    </form>
+  </div>
+  {% else %}
+  <p>暂无草案。</p>
+  {% endfor %}
+</section>
+{% endif %}
+<section>
+  <h2>已生效版本</h2>
+  <table>
+    <thead><tr><th>版本</th><th>母叶清单</th><th>创建人</th><th>生效时间</th></tr></thead>
+    <tbody>
+      {% for v in versions %}
+      <tr>
+        <td>版本 {{ v.version }}</td>
+        <td>{{ v.leaves | map(attribute='name') | join('、') }}</td>
+        <td>{{ v.created_by }}</td>
+        <td>{{ v.activated_at.strftime('%Y-%m-%d %H:%M') if v.activated_at else '' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">暂无已生效版本。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

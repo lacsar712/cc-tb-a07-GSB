@@ -11,6 +11,9 @@
     table { width: 100%; background: #fffaf3; border-collapse: collapse; }
     td, th { padding: 8px; border-bottom: 1px solid #e6d3c0; text-align: left; }
     form { background: #fffaf3; padding: 12px; margin-bottom: 16px; }
+    form.inline { display: inline-block; background: transparent; padding: 0; margin: 0 8px 0 0; }
+    .draft { background: #fffaf3; padding: 12px; margin-bottom: 12px; }
+    .flash { background: #fdf3d7; border: 1px solid #e0c37e; padding: 8px 12px; }
     .pass { color: #166534; } .fail { color: #9f1239; }
   </style>
 </head>
@@ -18,11 +21,18 @@
   <header>
     <strong>茶叶拼配审评台</strong>
     {% if session.user %}
+      <a href="{{ url_for('home') }}">审评记录</a>
+      <a href="{{ url_for('recipes') }}">配方版本</a>
       <span>{{ session.user }}</span>
       <a href="{{ url_for('logout') }}">退出</a>
     {% endif %}
   </header>
-  <main>{% block body %}{% endblock %}</main>
+  <main>
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}<p class="flash">{{ message }}</p>{% endfor %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+  </main>
   <script>
     document.addEventListener("submit", async (event) => {
       const form = event.target;
